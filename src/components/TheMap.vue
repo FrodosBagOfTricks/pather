@@ -1,5 +1,7 @@
 <template>
   <canvas
+    :style="mapPosition"
+    class="map"
     ref="canvas"
     :width="gameGrid.width"
     :height="gameGrid.height"
@@ -23,6 +25,14 @@ const gameGrid = ref({
   width: 2143,
 });
 
+// Find the offset of the grid from canvas
+const gameGridCanvasOffsetX = (gameGrid.value.width - mapWidth) / 2;
+const gameGridCanvasOffsetY = (gameGrid.value.height - mapHeight) / 2;
+
+const mapPosition = {
+  transform: `translate(${-gameGridCanvasOffsetX}px, ${-gameGridCanvasOffsetY}px)`,
+};
+
 onMounted((): void => {
   const canv = canvas.value;
 
@@ -33,12 +43,14 @@ onMounted((): void => {
       const image = new Image(mapWidth, mapHeight);
       image.src = mapImage;
       image.onload = () => {
-        // Find the offset of the grid from canvas
-        const dx = (gameGrid.value.width - mapWidth) / 2;
-        const dy = (gameGrid.value.height - mapHeight) / 2;
-
         // Draw map to 1:1 with gameGrid
-        context.drawImage(image, dx, dy, image.width, image.height);
+        context.drawImage(
+          image,
+          gameGridCanvasOffsetX,
+          gameGridCanvasOffsetY,
+          image.width,
+          image.height
+        );
 
         // Translate point of origin to centre of map
         context.translate(gameGrid.value.width / 2, gameGrid.value.height / 2);
